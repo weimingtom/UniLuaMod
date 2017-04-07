@@ -55,7 +55,9 @@ namespace UniLua
 				bytes[i] = (byte)s[i];
 			}
 
-			lua.PushString( Encoding.UTF8.GetString( bytes, 0, bytes.Length ) );
+			//FIXME:
+			//lua.PushString( Encoding.UTF8.GetString( bytes, 0, bytes.Length ) );
+			lua.PushString( Encoding.UTF8.GetString( bytes ) );
 			return 1;
 		}
 

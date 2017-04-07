@@ -22,8 +22,8 @@ namespace UniLua
 #if !UNITY_WEBPLAYER
 		private static int OS_Clock( ILuaState lua )
 		{
-            
-			//lua.PushNumber( Process.GetCurrentProcess().TotalProcessorTime.TotalSeconds );
+            //FIXME:
+			lua.PushNumber( Process.GetCurrentProcess().TotalProcessorTime.TotalSeconds );
 			return 1;
 		}
 #endif

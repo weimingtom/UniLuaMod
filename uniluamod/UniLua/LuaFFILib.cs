@@ -185,9 +185,10 @@ namespace UniLua
 				}
 				catch( Exception e )
 				{
-                    //lua.PushString( "call_method Exception: " + e.Message +
-                    //    "\nSource:\n" + e.Source +
-                    //    "\nStaceTrace:\n" + e.StackTrace );
+					//FIXME:
+                    lua.PushString( "call_method Exception: " + e.Message +
+                        "\nSource:\n" + e.Source +
+                        "\nStaceTrace:\n" + e.StackTrace );
 					lua.Error();
 					return 0;
 				}

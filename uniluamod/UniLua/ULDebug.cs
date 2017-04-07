@@ -1,7 +1,15 @@
-﻿using System;
+﻿//#define UNITY
+
+using System;
 
 namespace UniLua.Tools
 {
+	//FIXME:
+#if UNITY
+	// using Logger = DebugAssist;
+	using Logger = UnityEngine.Debug;
+#endif	
+	
 	// thanks to dharco
 	// refer to https://github.com/dharco/UniLua/commit/2854ddf2500ab2f943f01a6d3c9af767c092ce75
 	public class ULDebug
@@ -17,9 +25,11 @@ namespace UniLua.Tools
 		
 		static ULDebug()
 		{
-
-			//Log = Logger.Log;
-			//LogError = Logger.LogError;
+#if UNITY
+			//FIXME:
+			Log = Logger.Log;
+			LogError = Logger.LogError;
+#endif	
 			if (false)
 			{
 				Log = NoAction;
