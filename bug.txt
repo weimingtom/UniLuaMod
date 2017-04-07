@@ -1,0 +1,6 @@
+1. (done) LuaFile.Readable:  Application.GetResourceStream -> new FileStream
+2. (done) LuaTable.GetHashNode: uint n = (uint)(hashcode); -> uint n = (uint)(hashcode & (0xffffffff >> 1)); 
+3. (done) getter/setter
+4. (done) default param
+5. (done) (xxx)=>{} -> delegate(xxxx xx){}
+6. (done) LuaAuxLib: Func<int,T> f -> LuaFunc<int,T> ... (added) public delegate TResult LuaFunc<TResult>();
