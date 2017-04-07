@@ -1235,7 +1235,9 @@
 
 		public static int CodeAsBx( FuncState fs, OpCode op, int a, int sBx )
 		{
-			return CodeABx( fs, op, a, ((uint)sBx)+Instruction.MAXARG_sBx);
+			//FIXME:System.OverflowException: 算术运算导致溢出。
+			//return CodeABx( fs, op, a, ((uint)sBx)+Instruction.MAXARG_sBx);
+			return CodeABx( fs, op, a, (uint)(sBx+Instruction.MAXARG_sBx));
 		}
 
 		public static int CodeABx( FuncState fs, OpCode op, int a, uint bc )

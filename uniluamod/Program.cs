@@ -17,7 +17,12 @@ namespace unilua_sharpdevelop
 			Console.WriteLine("Hello World!");
 			
 			// TODO: Implement Functionality Here
-			new UniLuaTest();
+			//new UniLuaTest();
+			
+			LuaScriptController t = new LuaScriptController();
+			t.LuaScriptFile = "benchmark/main.lua";
+			t.Awake();
+			t.Start();
 			
 			Console.Write("Press any key to continue . . . ");
 			Console.ReadKey(true);

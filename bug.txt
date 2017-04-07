@@ -4,3 +4,5 @@
 4. (done) default param
 5. (done) (xxx)=>{} -> delegate(xxxx xx){}
 6. (done) LuaAuxLib: Func<int,T> f -> LuaFunc<int,T> ... (added) public delegate TResult LuaFunc<TResult>();
+7. (done) Coder:CodeAsBx: ((uint)sBx)+Instruction.MAXARG_sBx->(uint)(sBx+Instruction.MAXARG_sBx)
+
