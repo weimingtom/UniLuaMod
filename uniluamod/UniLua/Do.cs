@@ -10,10 +10,11 @@ namespace UniLua
 
 	public class LuaRuntimeException : Exception
 	{
+		private ThreadStatus _ErrCode; 
 		public ThreadStatus ErrCode 
 		{ 
-			get {return ErrCode;} 
-			private set {ErrCode = value;} 
+			get {return _ErrCode;} 
+			private set {_ErrCode = value;} 
 		}
 
 		public LuaRuntimeException( ThreadStatus errCode )
