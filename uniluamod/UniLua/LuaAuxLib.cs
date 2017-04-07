@@ -1,10 +1,9 @@
-﻿
+﻿using System;
+using System.IO;
+using System.Collections.Generic;
+
 namespace UniLua
 {
-	using System;
-	using System.IO;
-	using System.Collections.Generic;
-
 	/// <summary>
 	/// see http://csharpindepth.com/Articles/Chapter1/Versions.aspx 
 	/// </summary>

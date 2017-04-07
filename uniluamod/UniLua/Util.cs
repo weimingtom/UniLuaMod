@@ -1,5 +1,4 @@
-﻿
-#define API_CHECK
+﻿#define API_CHECK
 #define UNILUA_ASSERT
 
 using System;

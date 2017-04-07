@@ -1,12 +1,11 @@
-﻿
-// #define DEBUG_FIND_UPVALUE
+﻿// #define DEBUG_FIND_UPVALUE
 
 using System.Collections.Generic;
 
-using ULDebug = UniLua.Tools.ULDebug;
-
 namespace UniLua
 {
+	using ULDebug = UniLua.Tools.ULDebug;
+
 	public partial class LuaState
 	{
 

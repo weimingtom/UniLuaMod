@@ -1,8 +1,7 @@
-﻿
+﻿using System.Collections.Generic;
+
 namespace UniLua
-{
-	using System.Collections.Generic;
-	
+{	
 	public class LuaDebug
 	{
 		public string 		Name;

@@ -1,13 +1,12 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
 
-using NumberStyles = System.Globalization.NumberStyles;
-
 namespace UniLua
-{
+{	
+	using NumberStyles = System.Globalization.NumberStyles;
+
     public class LLexException : Exception
     {
         public LLexException( string info ) : base( info ) { }

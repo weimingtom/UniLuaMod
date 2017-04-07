@@ -1,10 +1,10 @@
-﻿
-// #define DEBUG_DUMMY_TVALUE_MODIFY
+﻿// #define DEBUG_DUMMY_TVALUE_MODIFY
+
+using System;
+using System.Collections.Generic;
 
 namespace UniLua
 {
-	using System;
-	using System.Collections.Generic;
 	using ULDebug = UniLua.Tools.ULDebug;
 
 	public struct TValue

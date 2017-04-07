@@ -1,13 +1,12 @@
-﻿
-// #define DEBUG_BINARY_READER
+﻿// #define DEBUG_BINARY_READER
 // #define DEBUG_UNDUMP
 
 using System;
 
-using ULDebug = UniLua.Tools.ULDebug;
-
 namespace UniLua
-{
+{	
+	using ULDebug = UniLua.Tools.ULDebug;
+
 	public class BinaryBytesReader
 	{
 		private ILoadInfo LoadInfo;

@@ -1,10 +1,5 @@
-﻿
-
-
-namespace UniLua.Tools
+﻿namespace UniLua.Tools
 {
-
-
 	// thanks to dharco
 	// refer to https://github.com/dharco/UniLua/commit/2854ddf2500ab2f943f01a6d3c9af767c092ce75
 	public class ULDebug

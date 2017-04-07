@@ -1,8 +1,7 @@
-﻿
+﻿using System.Diagnostics;
+
 namespace UniLua
 {
-	using System.Diagnostics;
-
 	internal class LuaOSLib
 	{
 		public const string LIB_NAME = "os";

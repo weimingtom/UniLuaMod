@@ -1,8 +1,6 @@
-﻿
-using NotImplementedException = System.NotImplementedException;
-
-namespace UniLua
-{
+﻿namespace UniLua
+{	
+	using NotImplementedException = System.NotImplementedException;
 	using InstructionPtr = Pointer<Instruction>;
 	using Math = System.Math;
 	using Exception = System.Exception;

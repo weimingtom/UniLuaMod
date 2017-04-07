@@ -1,12 +1,10 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 
-using ULDebug = UniLua.Tools.ULDebug;
-
 namespace UniLua
 {
+	using ULDebug = UniLua.Tools.ULDebug;
 	using InstructionPtr = Pointer<Instruction>;
 
 	public class FuncState
