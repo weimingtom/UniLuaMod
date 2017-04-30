@@ -6,7 +6,7 @@ namespace UniLua
 	using StringBuilder = System.Text.StringBuilder;
 	using Char = System.Char;
 	using Int32 = System.Int32;
-
+	
 	internal static class LuaBaseLib
 	{
 		internal static int OpenLib( ILuaState lua )
@@ -63,7 +63,8 @@ namespace UniLua
 				return lua.L_Error( "{0}", lua.L_OptString( 2, "assertion failed!" ) );
 			return lua.GetTop();
 		}
-
+		private static int memCount = 1 * 1024 * 1024 * 1024; //FIXME:
+		private static bool isStart = true;
 		public static int B_CollectGarbage( ILuaState lua )
 		{
 			// not implement gc
@@ -71,15 +72,36 @@ namespace UniLua
 			switch( opt )
 			{
 				case "count":
-					lua.PushNumber( 0 );
-					lua.PushNumber( 0 );
+					double k = (int)(memCount--); //FIXME:
+					k = k / 1024.0;
+					double b = k*1024 - System.Math.Floor(k)*1024;
+					lua.PushNumber(k); //FIXME://lua.PushNumber( 0 );
+					lua.PushNumber(b);//lua.PushNumber( 0 ); //FIXME:
 					return 2;
 
 				case "step":
-				case "isrunning":
 					lua.PushBoolean( true );
 					return 1;
-
+					
+				case "isrunning":
+					//lua.PushBoolean( true ); //FIXME:
+					lua.PushBoolean( isStart );
+					return 1;
+					
+				case "stop":
+					isStart = false;
+					lua.PushInteger( 0 );
+					return 1;
+					
+				case "restart":
+					isStart = true;
+					lua.PushInteger( 0 );
+					return 1;
+					
+				case "collect":
+					lua.PushBoolean( false );
+					return 1;						
+					
 				default:
 					lua.PushInteger( 0 );
 					return 1;

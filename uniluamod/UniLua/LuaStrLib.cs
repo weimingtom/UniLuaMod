@@ -891,7 +891,21 @@ namespace UniLua
 		private static int Str_Rep( ILuaState lua )
 		{
 			// TODO
-			throw new System.NotImplementedException();
+			//throw new System.NotImplementedException();
+			
+			//see https://github.com/howard0su/cslua
+			string s = lua.L_CheckString(1);
+			int num = lua.L_CheckInteger(2);
+
+			StringBuilder sb = new StringBuilder();
+			for(int i = 0; i < num; i++)
+			{
+				sb.Append(s);
+			}
+
+			lua.PushString(sb.ToString());
+
+			return 1;
 		}
 
 		private static int Str_Reverse( ILuaState lua )
