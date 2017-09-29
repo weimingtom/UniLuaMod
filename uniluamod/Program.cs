@@ -31,12 +31,18 @@ namespace unilua_sharpdevelop
 				t.Start();
 			}
 			
-			if (true)
+			if (false)
 			{
 				LuaScriptController t = new LuaScriptController();
 				t.LuaScriptFile = "framework/test.lua";
 				t.Awake();
 				t.Start();				
+			}
+			
+			if (true)
+			{
+				LuaScriptController2 t = new LuaScriptController2();
+				t.Awake();
 			}
 			
 			Console.Write("Press any key to continue . . . ");
