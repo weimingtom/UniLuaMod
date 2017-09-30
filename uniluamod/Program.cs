@@ -39,10 +39,16 @@ namespace unilua_sharpdevelop
 				t.Start();				
 			}
 			
-			if (true)
+			if (false)
 			{
 				LuaScriptController2 t = new LuaScriptController2();
 				t.Awake();
+			}
+			
+			if (true)
+			{
+		        UniLuaInterface.Lua lua = new UniLuaInterface.Lua();
+		        lua.DoFile("examples/fib_mod.lua");
 			}
 			
 			Console.Write("Press any key to continue . . . ");

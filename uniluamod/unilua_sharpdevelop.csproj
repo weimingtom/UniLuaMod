@@ -115,6 +115,9 @@
     <None Include="benchmark\sci_mark.lua">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="examples\fib_mod.lua">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="framework\main.lua">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -217,6 +220,7 @@
     <Folder Include="benchmark" />
     <Folder Include="framework" />
     <Folder Include="LuaInterface" />
+    <Folder Include="examples" />
     <Folder Include="test" />
     <Folder Include="UniLua" />
   </ItemGroup>
