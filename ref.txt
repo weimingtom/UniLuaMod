@@ -1,0 +1,355 @@
+2017-9-30 10:32 来自 微博 weibo.com
+《unityでuniluaを使ってADV機能を実装する》
+https://qiita.com/masakam1/items/62d6e5968443836689c2
+这篇文章介绍怎么把unilua整合到一个adv对话系统中，因为没有源码只能靠猜了。它认为一个对话脚本是由很多个eventXXXX.lua文件构成，
+所以可以把一个lua看成是一个独立的场景，每个函数调用相当于一个宏指令，宏指令可以自定义很多种，
+但最终实现只是少数的几个函数c_Command和c_GetVariable（c_Command的作用类似printf，可以变长参数），
+所以在嵌入unilua时只需要用一个switch就可以避免繁琐的绑定。
+由于宏指令可能是堵塞的（例如等待n秒），所以在堵塞的函数中可以使用coroutine.yield(0)切换到Csharp端。
+所以lua的作用是执行Csharp后执行下一条；执行Csharp后等待；执行Csharp后获取变量值并执行下一条
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------
+
+https://qiita.com/masakam1/items/62d6e5968443836689c2
+
+1473700102 @masakam1
+posted at 2015-12-10
+ Revisions
+ Edit Requests
+ Show all likers of this article
+ Show article as Markdown
+ Report article
+Unity 2 Advent Calendar 2015 Day 10
+unityでuniluaを使ってADV機能を実装する
+
+LuaUnity3D
+More than 1 year has passed since last update.
+動機
+
+ADVみたいな2Dの寸劇を制御するスクリプトが欲しかったのです。
+最初はexcelで入力するcsv形式の独自スクリプトを作りました。
+RPGツクールを参考にif elseもサポートしました。
+しかしexcelでの入力は不便でした。
+if else をサポートするなら普通のエディタで記述したいものです。
+そこで誰でも一度は聞いたことあるスクリプトluaに目をつけました。
+
+色んなLuaパーサー
+
+unity luaでググると色々出てきます
+
+unity Lua Interface 2011年から更新無し dllなのでwindows用か
+uLua 有料 ios androidでも動作するがプラグイン形式
+BBlua　有料 ios androidでも動作するプラグイン形式
+NLua 色んなplatform向けがある、unity3Dと.net Pure C#何が違うんだ…
+unilua C#実装
+MoonSharp おそらく一番モダンか？ C#実装で.net mono xamarin unityとの互換性
+僕が求めていたのは、ios android端末でも動作するものでした。
+純粋なC#で記述したのが望ましく、その要求を満たしてたのがuniluaでした（2014年の時点では。今ならmoonsharpが良さそう
+ともあれluaを組み込んでADVパートを実装してみましょう。
+
+Luaスクリプト
+
+僕が実装したLuaドラマスクリプトはどういうものか見てみましょう。
+以下はios android で遊べるはらぺこウィッチーズで実際に使われたスクリプトの抜粋です。
+
+event0001.lua
+require("common/common")
+function event0100()
+    c_2dcharShow(kwd_ChEila,kwd_FileCp01_Stand,kwd_ShowInstant,kwd_Pos_OutR);
+    c_2dcharShow(kwd_ChMinna,kwd_FileCp03_Stand,kwd_ShowInstant,kwd_Pos_OutL);
+    c_2dcharReverse(kwd_ChEila,false);
+    c_2dcharReverse(kwd_ChMinna,true);
+    c_Wait(0.5);
+
+    c_toggleWindow(true);
+
+    c_2dcharMove(kwd_ChEila,kwd_Pos_R,kwd_SpeedFast, true);
+    c_2dcharMove(kwd_ChMinna,kwd_Pos_L,kwd_SpeedFast, true);
+    c_showmessage(kwd_NameAuto,kwd_ChMinna,kwd_FukiNormal,"aaa","こちらミーナ<br>エイラ、聞こえてる？");
+    --省略
+    c_showmessage(kwd_NameAuto,kwd_ChMinna,kwd_FukiNormal,"aaa","一人でも戦えるように装備を一新しておいたけれど<br>説明はいる？");
+    c_switch("頼むぞ","ムリダナ",nil,nil);
+    idx = c_getvariable(1);--とあるC#global配列のidx 1には直前に選ばれた選択肢番号が入るというルール
+    if idx == 0 then
+        c_showmessage(kwd_NameAuto,kwd_ChMinna,kwd_FukiNormal,"aaa","ふふ、わかったわ");
+    else
+        c_showmessage(kwd_NameAuto,kwd_ChMinna,kwd_FukiNormal,"aaa","えっ？$|あぁ必要ないってことね<br>了解よ");
+
+    end
+    c_toggleWindow(false);
+
+    c_changeScreenTone(0,0,0,0,0.5,true);
+    c_opvariable(va_ScenarioProcess,kwd_OpMov,kwd_ParamConst,ev_ScStreetED,0,0);
+
+    c_clearAllPic();
+end
+common.lua
+function c_2dcharShow(kwd_CharID, szFilename, kwd_Show, kwd_Pos)
+    libc.c_Command(237, kwd_CharID, szFilename, kwd_Show, kwd_Pos);
+end
+function c_showmessage(name, kwd_charid, kwd_fuki, voicefile, message)
+    libc.c_Command(101, name, kwd_charid, kwd_fuki, voicefile, message);
+    coroutine.yield(0);
+end
+function c_getvariable(id)
+    val = libc.c_GetVariable(id);
+    return val;
+end
+--他にも色々な関数が定義
+event0100.luaはドラマスクリプトです。好きなだけ量産します。
+common.luaはドラマスクリプトで使う関数や定数を定義します。
+
+libc.c_Command(cmdID,パラメータ);
+libc.c_GetVariable(id);
+基本この2つに集約されます。どちらもC#で定義されてる関数と思ってください。
+coroutine.yield(0)は、luaからC#に処理を戻すために使います。
+メッセージ表示はカタカタ表示だし、ユーザーの入力を受けるので戻す必要があるわけです。
+
+このluaファイルをunityで読み込みドラマを再生するわけです。
+
+C#側
+
+luaの仕組みについてはこちらの解説が一番わかりやすいです。
+c++組み込みの説明ですがC#でも考え方は同じです。
+
+読み込み再生概要
+
+luaファイルはResources/LuaRoot以下に置きます。
+拡張子はunityが読み込めるよう.txtにリネームします。
+
+dramaManager.cs
+        _dramaInterpreter.Load(dramaID, uniqueID);
+public Status Update()
+    {
+        Status s = _dramaInterpreter.ExecuteScript();
+        return s;
+    }
+単純化してますが、luaファイルを読み込んで毎フレーム処理してやる。
+するとdramaInterpreter内部でluaを適宜パースされうまい具合ドラマ再生されます。
+では詳細に見ていきましょう。
+
+luaファイル読み込みと初期化
+
+LuaFile.cs
+internal class LuaFile
+    {
+        private static readonly string LUA_ROOT = "LuaRoot";
+        //private static readonly string LUA_ROOT = System.IO.Path.Combine(, "LuaRoot");
+
+        public static FileLoadInfo OpenFile( string filename )
+        {
+            var path = GetPath( filename );
+            Debug.Log( "lua filepath =" + path );
+            TextAsset ta = Resources.Load( path, typeof(TextAsset) ) as TextAsset;
+            return new FileLoadInfo(  ta.bytes );
+        }
+
+        public static bool Readable( string filename )
+        {
+            var path = GetPath( filename );
+            try {
+                TextAsset ta = Resources.Load( path, typeof( TextAsset ) ) as TextAsset;
+                if( ta != null){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+            catch( Exception ) {
+                return false;
+            }
+        }
+        private static string GetPath( string filename ) {
+            //filename = Path.GetFileNameWithoutExtension( filename );
+            if( filename.EndsWith( ".lua" ) ) {
+                filename = filename.Substring( 0, filename.Length - 4 );
+            }
+            return LUA_ROOT + "/" + filename;
+        }
+    }
+uniluaはそのままだとResourcesから読み込めないので修正してやります。
+他のフォルダやassetbundle、メモリ上のstringから読ませたい場合は適宜修正する必要があります。
+
+dramaInterpreter.cs
+public const string LIB_NAME = "FSMEventRunLua.cs";
+    public static int OpenLib(ILuaState lua)
+    {
+        var define = new NameFuncPair[]{
+            new NameFuncPair("c_Command", c_Command),
+            new NameFuncPair("c_GetVariable",c_GetVariable),
+        };
+        lua.L_NewLib(define);
+        return 1;
+    }
+    private static DramaInterpreter s_dramaInterpreter = null;
+    public static int c_Command(ILuaState lua)
+    {
+        s_dramaInterpreter.ProcCommandByLua(lua);
+        return 1;
+    }
+    public static int c_GetVariable(ILuaState lua)
+    {
+        s_dramaInterpreter.ProcGetVariableByLua(lua);
+        return 1;
+    }
+public void Load(int iEventID, int uniqueID)
+    {
+        if (m_Lua != null)
+        {
+            m_Lua = null;
+        }
+
+        if (m_Lua == null)
+        {
+            m_Lua = LuaAPI.NewState();
+            m_Lua.L_OpenLibs();
+            m_Lua.L_RequireF(LIB_NAME, OpenLib, false);
+        }
+        _isNeedSkip = false;
+        _uniqueID = uniqueID;
+        string fileName = string.Format("event{0:D4}", iEventID);
+        m_Lua.L_DoFile(fileName);
+        m_Lua.GetGlobal(fileName);
+
+    }
+安全のためlua stateは保持せず毎回作り直します。
+luaファイルの読み込みと初期化を行っています。
+
+OpenLib関数が最も重要で
+luaファイルをパースして呼ばれるC#関数はここで定義されたもののみです。
+ここではc_Commandとc_GetVariableだけが呼ばれます。
+これはcommon.luaで呼んでいる関数ですね。
+c_Commandに渡される多様な引数に基づき、立ち絵を表示したり、メッセージを再生ししたりします。
+
+lua実行、コマンド実行
+
+dramaInterpreter.cs
+public DramaManager. Status ExecuteScript()
+    {
+        ThreadStatus tstatus = m_Lua.Resume(m_Lua, 0);
+        if (tstatus == ThreadStatus.LUA_OK)
+        {
+            return DramaManager.Status.Done;
+        }
+
+        return DramaManager.Status.None;
+    }
+resumeすると前回yieldしたところから再開します。
+unityのcoroutineのような挙動です。
+luaスクリプトを最後まで実行するとThreadStatus.LUA_OKが返ってきます。
+
+Resumeの結果先に定義したc_Command関数が呼ばれます。
+そのままProcCommandByLuaが呼ばれます。
+
+dramaInterpreter.cs
+private void ProcCommandByLua(ILuaState lua)
+{
+        int n = lua.GetTop();
+
+        List<bool> boolList = new List<bool>(8);
+        List<float> floatList = new List<float>(8);
+        List<string> strList = new List<string>(8);
+        List<int> intList = new List<int>(8);
+
+        // 1 はコマンド ID が入ってる
+        for (int i = 2; i <= n; ++i)
+        {
+            LuaType t = lua.Type(i);
+            switch (t)
+            {
+                case LuaType.LUA_TNIL:
+                    break;
+                case LuaType.LUA_TBOOLEAN:
+                    boolList.Add(lua.ToBoolean(i));
+                    break;
+                case LuaType.LUA_TLIGHTUSERDATA:
+                    break;
+                case LuaType.LUA_TNUMBER:
+                    floatList.Add((float)lua.ToNumber(i));
+                    break;
+                case LuaType.LUA_TSTRING:
+                    string str = ConvertStringToUtf8(lua.ToString(i));
+                    //string str = lua.ToString( i );
+                    strList.Add(str);
+                    break;
+                case LuaType.LUA_TTABLE:
+                    break;
+                case LuaType.LUA_TFUNCTION:
+                    break;
+                case LuaType.LUA_TUSERDATA:
+                    break;
+                case LuaType.LUA_TTHREAD:
+                    break;
+                case LuaType.LUA_TUINT64:
+                    intList.Add((int)lua.ToUInt64(i));
+                    break;
+            }
+        }
+
+        int cmdID = lua.ToInteger(1);
+
+        // スタックを空にする
+        lua.Pop(n);
+        switch(cmdID){
+              case 101:// c_showmessage
+                   // メッセージ再生
+              case 237:// c_2dcharShow
+                   // 立ち絵表示
+        }
+}
+スタックの1個目はコマンドID
+それ以降に各コマンドIDに対応したパラメータが入っています。
+あとはそれらを元にメッセージ再生したり、立ち絵を表示したりします。
+
+Lua実行、luaに値を返す
+
+ADVでよくある選択肢で分岐を実現するためにはluaに値を返す必要があります。
+それを担っているのがc_GetVariableです。
+
+dramaInterprter.cs
+ public void ProcGetVariableByLua(ILuaState lua)
+    {
+        int n = lua.GetTop();
+        int idx = lua.ToInteger(1);
+        // スタックを空にする
+        lua.Pop(n);
+
+        int val = GlobalVariable.instance.Get(idx);
+        lua.PushInteger(val);
+    }
+まとめ
+
+僕のドラマスクリプトのキモはRPGツクールでもおなじみのcmdIDとパラメータです。
+それってわざわざLuaでやる必要あるの？ぶっちゃけcsvでよくね　という意見もあるでしょう。
+でもcsvなりの独自フォーマットの場合if elseやfor loopの実装は結構大変です（階層が深くなったらどうします？
+加えてそれを記述するためのエディタの実装も大変です。
+
+一方Luaであれば言語仕様としてif elseが実装されてます。
+スクリプト言語なので好きなエディタで記述できます、実にプログラマ向き（僕はeclipseのlua plugin使ってます
+
+そしてもちろん組み込みに対応した環境もとても多いです。
+C、C++は公式で標準サポートされてます。
+他の言語もサードパーティ製のパーサーないしインターフェイスライブラリがたくさｎ公開されています
+一番上で上げたとおりunity向けのパーサー何種類もあります。
+ue4でも読み込みサポートされてるようですし
+autodesk stingrayもluaスクリプトが使えます（むしろluaが開発言語？ゲームのロジックまでluaは逆にしんどい気もしますが…
+
+ゲーム業界で最もスタンダードなスクリプト言語Lua使えて損はないですし
+unityに組み込んでみてはどうでしょう？
